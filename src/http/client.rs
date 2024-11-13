@@ -2965,6 +2965,26 @@ impl Http {
         .await
     }
 
+    /// Modifies information about the current application.
+    ///
+    /// **Note**: Only applications may use this endpoint.
+    pub async fn edit_current_application_info(
+        &self,
+        map: &impl serde::Serialize,
+    ) -> Result<CurrentApplicationInfo> {
+        let body = to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(body),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Patch,
+            route: Route::OAuth2ApplicationCurrent,
+            params: None,
+        })
+        .await
+    }
+
     /// Gets information about the user we're connected with.
     pub async fn get_current_user(&self) -> Result<CurrentUser> {
         self.fire(Request {
