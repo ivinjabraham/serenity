@@ -45,43 +45,56 @@ pub struct CurrentApplicationInfo {
     pub icon: Option<ImageHash>,
     pub description: FixedString,
     #[serde(default)]
-    pub rpc_origins: FixedArray<String>,
+    pub rpc_origins: FixedArray<FixedString>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
+    #[serde(default)]
+    pub bot: User,
     #[serde(default)]
     pub terms_of_service_url: Option<FixedString>,
     #[serde(default)]
     pub privacy_policy_url: Option<FixedString>,
-    pub owner: Option<User>,
-    // omitted `summary` because it deprecated
+    #[serde(default)]
+    pub owner: User,
     pub verify_key: FixedString,
     pub team: Option<Team>,
     #[serde(default)]
     pub guild_id: Option<GuildId>,
     #[serde(default)]
+    pub guild: Option<PartialGuild>,
+    #[serde(default)]
     pub primary_sku_id: Option<SkuId>,
     #[serde(default)]
-    pub slug: Option<FixedString>,
+    pub slug: FixedString,
     #[serde(default)]
-    pub cover_image: Option<FixedString>,
+    pub cover_image: FixedString,
     #[serde(default)]
     pub flags: Option<ApplicationFlags>,
     #[serde(default)]
-    pub tags: Option<Vec<String>>,
+    pub approximate_guild_count: Option<u32>,
+    #[serde(default)]
+    pub approximate_user_install_count: Option<u32>,
+    #[serde(default)]
+    pub redirect_uris: FixedArray<FixedString>,
+    #[serde(default)]
+    pub interactions_endpoint_url: Option<FixedString>,
+    /// The application's role connection verification entry point, which when configured will
+    /// render the app as a verification method in the guild role verification configuration.
+    #[serde(default)]
+    pub role_connections_verification_url: Option<FixedString>,
+    #[serde(default)]
+    pub event_webhooks_url: Option<FixedString>,
+    pub event_webhook_status: EventWebhookStatus,
+    #[serde(default)]
+    pub event_webhook_type: FixedArray<EventWebhookType>,
+    #[serde(default)]
+    pub tags: Option<FixedArray<FixedString>>,
     #[serde(default)]
     pub install_params: Option<InstallParams>,
     #[serde(default)]
-    pub custom_install_url: Option<FixedString>,
-    /// The application's role connection verification entry point, which when configured will
-    /// render the app as a verification method in the guild role verification configuration.
-    pub role_connections_verification_url: Option<FixedString>,
-    #[serde(default)]
     pub integration_types_config: HashMap<InstallationContext, InstallationContextConfig>,
-    pub approximate_guild_count: Option<u32>,
-    pub approximate_user_install_count: Option<u32>,
-    pub guild: Option<PartialGuild>,
-    pub redirect_uris: Option<Vec<String>>,
-    pub interactions_endpoint_url: Option<String>,
+    #[serde(default)]
+    pub custom_install_url: FixedString,
 }
 
 impl ApplicationId {
@@ -93,6 +106,27 @@ impl ApplicationId {
     #[must_use]
     pub fn store_url(self) -> String {
         format!("https://discord.com/application-directory/{self}/store")
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[non_exhaustive]
+pub enum EventWebhookType {
+    ApplicationAuthorized,
+    EntitlementCreate,
+    QuestUserEnrollment,
+}
+
+enum_number! {
+    #[derive(Clone, Debug, Deserialize, Serialize)]
+    #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+    #[non_exhaustive]
+    pub enum EventWebhookStatus {
+        Enabled = 1,
+        Disabled = 2,
+        DisabledByDiscord = 3,
+        _ => Unknown(u8),
     }
 }
 
